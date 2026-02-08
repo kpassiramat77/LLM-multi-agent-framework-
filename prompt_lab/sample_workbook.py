@@ -46,16 +46,16 @@ def create_sample_workbook(path: str) -> None:
     ws_formulas["A4"] = "TableAdjustedCharge"
     ws_formulas["B4"] = "=Volume*BaseRate*RateTable"
 
-    workbook.defined_names.append(
+    workbook.defined_names.add(
         DefinedName("BaseRate", attr_text="Inputs!$B$2")
     )
-    workbook.defined_names.append(
+    workbook.defined_names.add(
         DefinedName("Volume", attr_text="Inputs!$B$3")
     )
-    workbook.defined_names.append(
+    workbook.defined_names.add(
         DefinedName("Adjustment", attr_text="Inputs!$B$4")
     )
-    workbook.defined_names.append(
+    workbook.defined_names.add(
         DefinedName("RateTable", attr_text="RateTable!$A$1:$B$4")
     )
 
