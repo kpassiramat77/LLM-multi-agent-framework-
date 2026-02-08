@@ -2,8 +2,8 @@
 
 This repository contains a **vendor-agnostic prompt lab** for validating multi-agent
 LLM prompts. It converts a synthetic Excel workbook into CSV artifacts, loads those
-CSV files, runs two agents that emit JSON fragments, validates each fragment, and
-assembles a minimal generic model JSON.
+CSV files, runs an Orchestrator agent plus two worker agents that emit JSON fragments,
+validates each fragment, and assembles a minimal generic model JSON.
 
 **Privacy note:** All sample data is synthetic and generic. No proprietary schemas,
 models, or business logic are included.
@@ -81,3 +81,4 @@ The assembled model JSON follows this structure:
 - Excel parsing: `openpyxl`
 - CSV parsing/writing: Python `csv` module
 - Validation: `jsonschema`
+- Agents: Orchestrator, Model Builder, Formula Calculation

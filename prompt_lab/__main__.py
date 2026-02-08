@@ -7,11 +7,15 @@ from prompt_lab.assembler import assemble_model
 from prompt_lab.csv_artifacts import convert_workbook_to_csvs
 from prompt_lab.csv_loader import load_csv_artifacts, load_csv_texts
 from prompt_lab.llm_client import build_llm_client
-from prompt_lab.prompts import build_agent_prompts
+from prompt_lab.prompts import build_agent_prompts, build_orchestrator_prompt
 from prompt_lab.sample_workbook import ensure_sample_workbook
 from prompt_lab.scorecard import build_scorecard, format_scorecard
 from prompt_lab.utils import ensure_dir, write_json_file
-from prompt_lab.validation import validate_fragment_output, validate_model
+from prompt_lab.validation import (
+    validate_fragment_output,
+    validate_model,
+    validate_orchestrator_output,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -41,10 +45,35 @@ def main() -> int:
     csv_texts = load_csv_texts(csv_manifest)
     csv_data = load_csv_artifacts(csv_manifest)
 
-    prompts = build_agent_prompts(csv_texts)
     llm_client = build_llm_client()
 
     agent_outputs = {}
+    orchestrator_prompt = build_orchestrator_prompt(csv_manifest)
+    orchestrator_raw = llm_client.generate(
+        agent_id="orchestrator",
+        system_prompt=orchestrator_prompt["system"],
+        user_prompt=orchestrator_prompt["user"],
+        csv_data=csv_data,
+    )
+    orchestrator_validation = validate_orchestrator_output(
+        orchestrator_raw, allowed_agents=["model_builder", "formula_calculation"]
+    )
+    agent_outputs["orchestrator"] = {
+        "prompt": orchestrator_prompt,
+        "raw_output": orchestrator_raw,
+        "parsed": orchestrator_validation["parsed"],
+        "validation": orchestrator_validation["report"],
+    }
+
+    assignments = {}
+    if orchestrator_validation["parsed"]:
+        for assignment in orchestrator_validation["parsed"].get("assignments", []):
+            agent_id = assignment.get("agent_id")
+            task = assignment.get("task")
+            if agent_id and task:
+                assignments[agent_id] = task
+
+    prompts = build_agent_prompts(csv_texts, assignments)
     for agent_id, prompt in prompts.items():
         raw_output = llm_client.generate(
             agent_id=agent_id,

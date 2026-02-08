@@ -63,3 +63,25 @@ FRAGMENT_SCHEMA = {
         "calculations": {"type": "array", "items": CALCULATION_SCHEMA},
     },
 }
+
+ORCHESTRATOR_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["assignments"],
+    "properties": {
+        "assignments": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["agent_id", "task"],
+                "properties": {
+                    "agent_id": {"type": "string", "minLength": 1},
+                    "task": {"type": "string", "minLength": 1},
+                },
+            },
+        },
+        "notes": {"type": "string"},
+    },
+}

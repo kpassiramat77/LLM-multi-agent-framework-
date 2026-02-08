@@ -34,7 +34,27 @@ class LlmClient:
         return response.output_text.strip()
 
     def _generate_mock(self, agent_id: str, csv_data: Dict[str, Any]) -> str:
-        if agent_id == "model_builder":
+        if agent_id == "orchestrator":
+            payload = {
+                "assignments": [
+                    {
+                        "agent_id": "model_builder",
+                        "task": (
+                            "Use inputs.csv and all table CSVs to produce "
+                            "inputs and tables without adding new names."
+                        ),
+                    },
+                    {
+                        "agent_id": "formula_calculation",
+                        "task": (
+                            "Use formulas.csv to produce calculations and "
+                            "reference only known inputs or tables."
+                        ),
+                    },
+                ],
+                "notes": "Keep outputs strictly JSON.",
+            }
+        elif agent_id == "model_builder":
             payload = {
                 "inputs": [
                     {"name": item["name"], "value": item["value"]}
