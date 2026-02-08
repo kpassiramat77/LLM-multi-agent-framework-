@@ -75,6 +75,27 @@ The assembled model JSON follows this structure:
 }
 ```
 
+## Flow Diagram
+
+```mermaid
+flowchart TD
+    A[CLI: python3 -m prompt_lab] --> B[Ensure sample workbook]
+    B --> C[Convert Excel to CSV artifacts]
+    C --> D[Load CSV texts + CSV data]
+    D --> E[Build Orchestrator prompt]
+    E --> F[Run Orchestrator agent]
+    F --> G[Validate orchestrator output]
+    G --> H[Build worker prompts with assignments]
+    H --> I[Run Model Builder agent]
+    H --> J[Run Formula Calculation agent]
+    I --> K[Validate Model Builder output]
+    J --> L[Validate Formula Calculation output]
+    K --> M[Assemble fragments into model JSON]
+    L --> M
+    M --> N[Validate assembled model]
+    N --> O[Write run report + scorecard]
+```
+
 ## Notes
 
 - Python 3.11
